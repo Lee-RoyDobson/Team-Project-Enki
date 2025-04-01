@@ -1,24 +1,111 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-export default function ChatPage() {
-  // State to track the selected topic
-  const [selectedTopic, setSelectedTopic] = useState("TEST TOPIC 1");
+type Message = {
+  sender: string;
+  content: string;
+};
 
-  // Handler for topic selection
+export default function ChatPage() {
+  // State management
+  const [selectedTopic, setSelectedTopic] = useState("TEST TOPIC 1");
+  const [inputMessage, setInputMessage] = useState("");
+  const [messages, setMessages] = useState<Message[]>([
+    { 
+      sender: "Enki", 
+      content: `Welcome to ${selectedTopic}! How can I help you?` 
+    }
+  ]);
+
+  // List of available topics
+  const topics = [
+    "TEST TOPIC 1", 
+    "TEST TOPIC 2", 
+    "TEST TOPIC 3", 
+    "TEST TOPIC 4", 
+    "TEST TOPIC 5"
+  ];
+
+  // Event handlers
   const handleTopicSelect = (topic: string) => {
     setSelectedTopic(topic);
-    // Here you could also load messages for this topic
-    // or perform other actions when a topic is selected
+    setMessages([
+      { sender: "Enki", content: `Welcome to ${topic}! How can I help you?` }
+    ]);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputMessage(e.target.value);
+  };
+
+  const handleSendMessage = () => {
+    if (!inputMessage.trim()) return;
+    
+    // Add user message to chat
+    const newMessages = [
+      ...messages, 
+      { sender: "You", content: inputMessage }
+    ];
+    
+    setMessages(newMessages);
+    setInputMessage("");
+    
+    // Simulate AI response
+    setTimeout(() => {
+      setMessages([
+        ...newMessages,
+        { 
+          sender: "Enki", 
+          content: `Simulated response for ${selectedTopic}.` 
+        }
+      ]);
+    }, 1000);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSendMessage();
+    }
+  };
+
+  // UI Components
+  const TopicButton = ({ topic }: { topic: string }) => (
+    <li>
+      <button 
+        onClick={() => handleTopicSelect(topic)}
+        className={`
+          w-full text-left p-2 rounded-lg 
+          hover:bg-gray-200 dark:hover:bg-gray-700 
+          transition cursor-pointer
+          ${selectedTopic === topic ? "bg-blue-100 dark:bg-blue-900" : ""}
+        `}
+      >
+        {topic}
+      </button>
+    </li>
+  );
+
+  const MessageBubble = ({ message }: { message: Message }) => {
+    const isEnki = message.sender === "Enki";
+    return (
+      <div className="mb-4">
+        <div className="font-semibold mb-1">{message.sender}</div>
+        <div className={`
+          p-3 rounded-lg 
+          ${isEnki ? "bg-blue-100 dark:bg-blue-900" : "bg-gray-200 dark:bg-gray-700"}
+        `}>
+          {message.content}
+        </div>
+      </div>
+    );
   };
 
   return (
     <div className="min-h-screen p-8 flex flex-col">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold">Chat Interface TEST</h1>
+        <h1 className="text-3xl font-bold">Chat Interface</h1>
         <Link href="/" className="text-blue-500 hover:underline">
           Back to Home
         </Link>
@@ -31,17 +118,8 @@ export default function ChatPage() {
           <h2 className="font-bold text-lg mb-4">Topics</h2>
           
           <ul className="space-y-2">
-            {["TEST TOPIC 1", "TEST TOPIC 2", "TEST TOPIC 3", "TEST TOPIC 4", "TEST TOPIC 5"].map((topic) => (
-              <li key={topic}>
-                <button 
-                  onClick={() => handleTopicSelect(topic)}
-                  className={`w-full text-left p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition cursor-pointer ${
-                    selectedTopic === topic ? "bg-blue-100 dark:bg-blue-900" : ""
-                  }`}
-                >
-                  {topic}
-                </button>
-              </li>
+            {topics.map((topic) => (
+              <TopicButton key={topic} topic={topic} />
             ))}
           </ul>
         </div>
@@ -53,30 +131,26 @@ export default function ChatPage() {
           
           {/* Chat messages window */}
           <div className="flex-1 overflow-y-auto mb-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
-            {/* Example messages - replace with your actual messages from */}
-            <div className="mb-4">
-              <div className="font-semibold mb-1">Enki</div>
-              <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                  MESSAGE PLACEHOLDER {selectedTopic}
-              </div>
-            </div>
-            
-            <div className="mb-4">
-              <div className="font-semibold mb-1">You</div>
-              <div className="p-3 bg-gray-200 dark:bg-gray-700 rounded-lg">
-                  REPLY PLACEHOLDER {selectedTopic}
-              </div>
-            </div>
+            {messages.map((message, index) => (
+              <MessageBubble key={index} message={message} />
+            ))}
           </div>
 
           {/* Input field */}
           <div className="flex gap-2">
             <input 
               type="text" 
+              value={inputMessage}
+              onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
               placeholder="Type your message..." 
               className="flex-1 p-3 border border-gray-300 dark:border-gray-700 rounded-lg"
+              autoFocus
             />
-            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer">
+            <button 
+              onClick={handleSendMessage}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer"
+            >
               Send
             </button>
           </div>
