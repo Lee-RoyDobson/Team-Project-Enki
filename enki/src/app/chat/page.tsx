@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { TopicButton } from "@/components/TopicButton";
+import { MessageBubble } from "@/components/MessageBubble";
 
 type Message = {
   sender: string;
@@ -70,38 +72,6 @@ export default function ChatPage() {
     }
   };
 
-  // UI Components
-  const TopicButton = ({ topic }: { topic: string }) => (
-    <li>
-      <button 
-        onClick={() => handleTopicSelect(topic)}
-        className={`
-          w-full text-left p-2 rounded-lg 
-          hover:bg-gray-200 dark:hover:bg-gray-700 
-          transition cursor-pointer
-          ${selectedTopic === topic ? "bg-blue-100 dark:bg-blue-900" : ""}
-        `}
-      >
-        {topic}
-      </button>
-    </li>
-  );
-
-  const MessageBubble = ({ message }: { message: Message }) => {
-    const isEnki = message.sender === "Enki";
-    return (
-      <div className="mb-4">
-        <div className="font-semibold mb-1">{message.sender}</div>
-        <div className={`
-          p-3 rounded-lg 
-          ${isEnki ? "bg-blue-100 dark:bg-blue-900" : "bg-gray-200 dark:bg-gray-700"}
-        `}>
-          {message.content}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="min-h-screen p-8 flex flex-col">
       <header className="mb-8">
@@ -119,7 +89,12 @@ export default function ChatPage() {
           
           <ul className="space-y-2">
             {topics.map((topic) => (
-              <TopicButton key={topic} topic={topic} />
+              <TopicButton 
+                key={topic} 
+                topic={topic} 
+                selectedTopic={selectedTopic}
+                onSelect={handleTopicSelect}
+              />
             ))}
           </ul>
         </div>
