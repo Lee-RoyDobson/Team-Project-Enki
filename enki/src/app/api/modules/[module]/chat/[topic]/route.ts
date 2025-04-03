@@ -7,9 +7,8 @@ export async function GET(
   { params }: { params: { module: string; topic: string } }
 ) {
   try {
-    // Destructure the params properly
-    const moduleName = params.module;
-    const topicName = params.topic;
+    // Await the params object before accessing properties
+    const { module: moduleName, topic: topicName } = await params;
 
     // Build path to the JSON file using the module name
     const filePath = path.join(
