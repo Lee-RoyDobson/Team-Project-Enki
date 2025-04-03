@@ -63,7 +63,7 @@ export function SendMessage({ messages, setMessages }: SendMessageProps) {
     // Add AI response to chat
     setMessages([
       ...newMessages,
-      { sender: "AI", content: response.output_text },
+      { sender: "Enki", content: response.output_text },
     ]);
     setInputMessage("");
   };
