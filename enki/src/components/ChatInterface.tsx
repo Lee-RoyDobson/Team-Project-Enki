@@ -17,6 +17,7 @@ interface ChatInterfaceProps {
   showBackButton?: boolean;
   backLink?: string;
   title?: string;
+  dataid?: string;
 }
 
 export function ChatInterface({
@@ -32,6 +33,7 @@ export function ChatInterface({
   showBackButton = true,
   backLink = "/",
   title = "Chat Interface",
+  dataid,
 }: ChatInterfaceProps) {
   // State management
   const [selectedTopic, setSelectedTopic] = useState(initialTopic);
@@ -42,11 +44,16 @@ export function ChatInterface({
   const loadMessagesForTopic = async (topic: string) => {
     setIsLoading(true);
     try {
+      // Use dataid if provided, otherwise format the title
+      const moduleId = dataid || title.toLowerCase().replace(/\s+/g, "-");
+
       // Convert topic name to a filename-friendly format
       const topicFileName = topic.toLowerCase().replace(/\s+/g, "-");
 
-      // Fetch the JSON file for this topic
-      const response = await fetch(`/api/chat/${topicFileName}`);
+      // Fetch the JSON file for this topic using moduleId in the path
+      const response = await fetch(
+        `/api/modules/${moduleId}/chat/${topicFileName}`
+      );
 
       if (!response.ok) {
         // If no specific JSON found, use default welcome message

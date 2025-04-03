@@ -15,6 +15,7 @@ export default function ChatPage() {
       ]}
       title="5CM504 ​​Legal, Ethical and Sustainability Issues"
       backLink="/" // Where the back button will redirect to
+      dataid="5CM504" // Data ID for the module
     />
   );
 }
