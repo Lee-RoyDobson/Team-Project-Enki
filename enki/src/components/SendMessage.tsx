@@ -31,7 +31,7 @@ export function SendMessage({ messages, setMessages }: SendMessageProps) {
     setMessages(newMessages);
 
     const response = await openai.responses.create({
-      model: "gpt-gpt-3.5-turbo",
+      model: "gpt-3.5-turbo",
       input: [
         {
           role: "system",
