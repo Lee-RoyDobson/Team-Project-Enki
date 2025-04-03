@@ -20,7 +20,6 @@ export default function Home() {
   }, []);
 
   const particlesLoaded = useCallback(async (container: any) => {
-    // Container loaded (no logging needed)
   }, []);
 
   return (

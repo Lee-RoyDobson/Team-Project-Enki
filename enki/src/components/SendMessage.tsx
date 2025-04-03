@@ -42,7 +42,7 @@ export function SendMessage({ messages, setMessages }: SendMessageProps) {
         type="text" 
         value={inputMessage}
         onChange={handleInputChange}
-        onKeyPress={handleKeyPress}
+        onKeyDown={handleKeyPress}
         placeholder="Type your message..." 
         className="flex-1 p-3 border border-gray-300 dark:border-gray-700 rounded-lg"
         autoFocus
