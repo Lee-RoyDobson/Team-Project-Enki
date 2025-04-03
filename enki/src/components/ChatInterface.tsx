@@ -20,6 +20,7 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({
+  // Default values for props
   initialTopic = "TEST TOPIC 1",
   topics = ["TEST TOPIC 1", "TEST TOPIC 2", "TEST TOPIC 3", "TEST TOPIC 4", "TEST TOPIC 5"],
   showBackButton = true,
@@ -49,7 +50,7 @@ export function ChatInterface({
         <h1 className="text-3xl font-bold">{title}</h1>
         {showBackButton && (
           <Link href={backLink} className="text-blue-500 hover:underline">
-            Back to Home
+            Back
           </Link>
         )}
       </header>
@@ -78,13 +79,13 @@ export function ChatInterface({
           <h2 className="text-xl font-semibold mb-4">{selectedTopic}</h2>
           
           {/* Chat messages window */}
-          <div className="flex-1 overflow-y-auto mb-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
+          <div className="flex-none overflow-y-auto mb-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 h-[70vh]">
             {messages.map((message, index) => (
               <MessageBubble key={index} message={message} />
             ))}
           </div>
 
-          {/* Input field - now using the component */}
+          {/* Input field */}
           <SendMessage 
             messages={messages}
             setMessages={setMessages}
