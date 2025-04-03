@@ -16,9 +16,9 @@ export const TopicButton: React.FC<TopicButtonProps> = ({
       onClick={() => onSelect(topic)}
       className={`
         w-full text-left p-2 rounded-lg 
-        hover:bg-gray-200 dark:hover:bg-gray-700 
+        hover:bg-gray-700 
         transition cursor-pointer
-        ${selectedTopic === topic ? "bg-blue-100 dark:bg-blue-900" : ""}
+        ${selectedTopic === topic ? "bg-blue-900" : ""}
       `}
     >
       {topic}

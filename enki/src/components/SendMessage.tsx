@@ -44,12 +44,12 @@ export function SendMessage({ messages, setMessages }: SendMessageProps) {
         onChange={handleInputChange}
         onKeyDown={handleKeyPress}
         placeholder="Type your message..." 
-        className="flex-1 p-3 border border-gray-300 dark:border-gray-700 rounded-lg"
+        className="flex-1 p-3 border border-gray-700 rounded-lg bg-gray-800 text-white"
         autoFocus
       />
       <button 
         onClick={handleSendMessage}
-        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer"
+        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg cursor-pointer"
       >
         Send
       </button>

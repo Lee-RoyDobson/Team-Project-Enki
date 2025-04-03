@@ -17,7 +17,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
       <div className="font-semibold mb-1">{message.sender}</div>
       <div className={`
         p-3 rounded-lg 
-        ${isEnki ? "bg-blue-100 dark:bg-blue-900" : "bg-gray-200 dark:bg-gray-700"}
+        ${isEnki ? "bg-blue-900" : "bg-gray-700"}
       `}>
         {message.content}
       </div>
