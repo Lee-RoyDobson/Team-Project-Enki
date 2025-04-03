@@ -47,6 +47,19 @@ export function ChatInterface({
     setInputMessage(e.target.value);
   };
 
+  // Generate AI response separately
+  const generateAIResponse = (currentMessages: Message[]) => {
+    setTimeout(() => {
+      setMessages([
+        ...currentMessages,
+        { 
+          sender: "Enki", 
+          content: `Simulated response for ${selectedTopic}.` 
+        }
+      ]);
+    }, 1000);
+  };
+
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
     
@@ -59,16 +72,8 @@ export function ChatInterface({
     setMessages(newMessages);
     setInputMessage("");
     
-    // Simulate AI response
-    setTimeout(() => {
-      setMessages([
-        ...newMessages,
-        { 
-          sender: "Enki", 
-          content: `Simulated response for ${selectedTopic}.` 
-        }
-      ]);
-    }, 1000);
+    // Call the separate AI response function
+    generateAIResponse(newMessages);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
