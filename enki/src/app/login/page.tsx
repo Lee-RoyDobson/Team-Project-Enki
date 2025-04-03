@@ -120,7 +120,7 @@ export default function LoginPage() {
                   number: {
                     density: {
                       enable: true,
-                      area: 600,
+                      area: 1200,
                     },
                     value: 100,
                   },
