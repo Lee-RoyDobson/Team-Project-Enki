@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { TopicButton } from "@/components/TopicButton";
 import { MessageBubble } from "@/components/MessageBubble";
+import { SendMessage } from "@/components/SendMessage";
 
 type Message = {
   sender: string;
@@ -27,7 +28,6 @@ export function ChatInterface({
 }: ChatInterfaceProps) {
   // State management
   const [selectedTopic, setSelectedTopic] = useState(initialTopic);
-  const [inputMessage, setInputMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     { 
       sender: "Enki", 
@@ -41,45 +41,6 @@ export function ChatInterface({
     setMessages([
       { sender: "Enki", content: `Welcome to ${topic}! How can I help you?` }
     ]);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputMessage(e.target.value);
-  };
-
-  // Generate AI response separately
-  const generateAIResponse = (currentMessages: Message[]) => {
-    setTimeout(() => {
-      setMessages([
-        ...currentMessages,
-        { 
-          sender: "Enki", 
-          content: `Simulated response for ${selectedTopic}.` 
-        }
-      ]);
-    }, 1000);
-  };
-
-  const handleSendMessage = () => {
-    if (!inputMessage.trim()) return;
-    
-    // Add user message to chat
-    const newMessages = [
-      ...messages, 
-      { sender: "You", content: inputMessage }
-    ];
-    
-    setMessages(newMessages);
-    setInputMessage("");
-    
-    // Call the separate AI response function
-    generateAIResponse(newMessages);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSendMessage();
-    }
   };
 
   return (
@@ -123,24 +84,11 @@ export function ChatInterface({
             ))}
           </div>
 
-          {/* Input field */}
-          <div className="flex gap-2">
-            <input 
-              type="text" 
-              value={inputMessage}
-              onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message..." 
-              className="flex-1 p-3 border border-gray-300 dark:border-gray-700 rounded-lg"
-              autoFocus
-            />
-            <button 
-              onClick={handleSendMessage}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer"
-            >
-              Send
-            </button>
-          </div>
+          {/* Input field - now using the component */}
+          <SendMessage 
+            messages={messages}
+            setMessages={setMessages}
+          />
         </main>
       </div>
     </div>
