@@ -10,9 +10,23 @@ type Message = {
   content: string;
 };
 
-export default function ChatPage() {
+interface ChatInterfaceProps {
+  initialTopic?: string;
+  topics?: string[];
+  showBackButton?: boolean;
+  backLink?: string;
+  title?: string;
+}
+
+export function ChatInterface({
+  initialTopic = "TEST TOPIC 1",
+  topics = ["TEST TOPIC 1", "TEST TOPIC 2", "TEST TOPIC 3", "TEST TOPIC 4", "TEST TOPIC 5"],
+  showBackButton = true,
+  backLink = "/",
+  title = "Chat Interface"
+}: ChatInterfaceProps) {
   // State management
-  const [selectedTopic, setSelectedTopic] = useState("TEST TOPIC 1");
+  const [selectedTopic, setSelectedTopic] = useState(initialTopic);
   const [inputMessage, setInputMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     { 
@@ -20,15 +34,6 @@ export default function ChatPage() {
       content: `Welcome to ${selectedTopic}! How can I help you?` 
     }
   ]);
-
-  // List of available topics
-  const topics = [
-    "TEST TOPIC 1", 
-    "TEST TOPIC 2", 
-    "TEST TOPIC 3", 
-    "TEST TOPIC 4", 
-    "TEST TOPIC 5"
-  ];
 
   // Event handlers
   const handleTopicSelect = (topic: string) => {
@@ -75,10 +80,12 @@ export default function ChatPage() {
   return (
     <div className="min-h-screen p-8 flex flex-col">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold">Chat Interface</h1>
-        <Link href="/" className="text-blue-500 hover:underline">
-          Back to Home
-        </Link>
+        <h1 className="text-3xl font-bold">{title}</h1>
+        {showBackButton && (
+          <Link href={backLink} className="text-blue-500 hover:underline">
+            Back to Home
+          </Link>
+        )}
       </header>
 
       {/* Main content with sidebar and chat */}
