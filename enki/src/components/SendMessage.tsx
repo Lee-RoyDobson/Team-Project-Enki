@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import OpenAI from "openai";
+import fs from 'fs';
+
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
   dangerouslyAllowBrowser: true,
@@ -17,6 +19,12 @@ interface SendMessageProps {
 
 export function SendMessage({ messages, setMessages }: SendMessageProps) {
   const [inputMessage, setInputMessage] = useState("");
+  const [conversationHistory, setConversationHistory] = useState([
+    {
+      role: "system",
+      content: "Have a conversation with the user about Technoethics and Emergent Technology. Do not deviate from this.",
+    },
+  ]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputMessage(e.target.value);
@@ -30,23 +38,15 @@ export function SendMessage({ messages, setMessages }: SendMessageProps) {
 
     setMessages(newMessages);
 
+    const updatedHistory = [
+      ...conversationHistory,
+      { role: "user", content: inputMessage },
+    ];
+    setConversationHistory(updatedHistory);
+
     const response = await openai.responses.create({
       model: "gpt-4o",
-      input: [
-        {
-          role: "system",
-          content: [
-            {
-              type: "input_text",
-              text: "Have a conversation with the user about Technoethics and Emergent Technology. Do not deviate from this.",
-            },
-            {
-              type: "input_text",
-              text: inputMessage,
-            },
-          ],
-        },
-      ],
+      input: updatedHistory.map((msg) => `${msg.role}: ${msg.content}`).join('\n'),
       text: {
         format: {
           type: "text",
@@ -61,11 +61,21 @@ export function SendMessage({ messages, setMessages }: SendMessageProps) {
     });
 
     // Add AI response to chat
-    setMessages([
-      ...newMessages,
-      { sender: "AI", content: response.output_text },
+    const aiMessage = { sender: "AI", content: response.output_text };
+    setMessages([...newMessages, aiMessage]);
+
+    // Update conversation history with AI response
+    setConversationHistory([
+      ...updatedHistory,
+      { role: "assistant", content: response.output_text },
     ]);
     setInputMessage("");
+
+    // Save conversation history to file
+    const jsonHistory = JSON.stringify(updatedHistory, null, 2);
+    fs.writeFileSync('conversationHistory.json', jsonHistory, 'utf8');
+
+
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
