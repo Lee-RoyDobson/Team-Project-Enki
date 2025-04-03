@@ -106,7 +106,7 @@ export default function Home() {
         </p>
         
         <div className="mt-8">
-          <Link href="/chat_test">
+          <Link href="/login">
             <button className="px-6 py-3 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 shadow-lg cursor-pointer">
               Get Started
             </button>
