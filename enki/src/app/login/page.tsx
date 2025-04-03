@@ -142,7 +142,7 @@ export default function LoginPage() {
         )}
       </div>
       
-      <div className="w-full max-w-md rounded-lg bg-gray-800/70 backdrop-filter backdrop-blur-md border border-gray-700/30 p-8 shadow-lg z-10">
+      <div className="w-full max-w-md rounded-lg bg-gray-800/50 backdrop-filter backdrop-blur-md border border-gray-700/30 p-8 shadow-lg z-10">
         <h1 className="mb-6 text-center text-3xl font-bold text-gray-100">Login to Enki</h1>
         
         {error && (
