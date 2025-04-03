@@ -45,7 +45,7 @@ export function SendMessage({ messages, setMessages }: SendMessageProps) {
     setConversationHistory(updatedHistory);
 
     const response = await openai.responses.create({
-      model: "gpt-4o",
+      model: "gpt-3.5-turbo",
       input: updatedHistory.map((msg) => `${msg.role}: ${msg.content}`).join('\n'),
       text: {
         format: {
@@ -61,7 +61,7 @@ export function SendMessage({ messages, setMessages }: SendMessageProps) {
     });
 
     // Add AI response to chat
-    const aiMessage = { sender: "AI", content: response.output_text };
+    const aiMessage = { sender: "Enki", content: response.output_text };
     setMessages([...newMessages, aiMessage]);
 
     // Update conversation history with AI response
