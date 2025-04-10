@@ -13,6 +13,7 @@ type Message = {
 interface SendMessageProps {
   messages: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  disabled?: boolean;
 }
 
 export function SendMessage({ messages, setMessages }: SendMessageProps) {
