@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import OpenAI from "openai";
+const openai = new OpenAI({
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true,
+});
 
 type Message = {
   sender: string;
@@ -17,37 +22,71 @@ export function SendMessage({ messages, setMessages }: SendMessageProps) {
     setInputMessage(e.target.value);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
-    
+
     // Add user message to chat
-    const newMessages = [
-      ...messages, 
-      { sender: "You", content: inputMessage }
-    ];
-    
+    const newMessages = [...messages, { sender: "You", content: inputMessage }];
+
     setMessages(newMessages);
+
+    const response = await openai.responses.create({
+      model: "gpt-3.5-turbo",
+      input: [
+        {
+          role: "system",
+          content: [
+            {
+              type: "input_text",
+              text: "Have a conversation with the user about Technoethics and Emergent Technology. Do not deviate from this.",
+            },
+            {
+              type: "input_text",
+              text: inputMessage,
+            },
+          ],
+        },
+      ],
+      text: {
+        format: {
+          type: "text",
+        },
+      },
+      reasoning: {},
+      tools: [],
+      temperature: 1,
+      max_output_tokens: 2048,
+      top_p: 1,
+      store: true,
+    });
+
+    // Add AI response to chat
+    setMessages([
+      ...newMessages,
+      { sender: "Enki", content: response.output_text },
+    ]);
     setInputMessage("");
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSendMessage();
     }
   };
 
   return (
     <div className="flex gap-2">
-      <input 
-        type="text" 
+      <input
+        type="text"
         value={inputMessage}
         onChange={handleInputChange}
         onKeyDown={handleKeyPress}
-        placeholder="Type your message..." 
-        className="flex-1 p-3 border border-gray-700 rounded-lg bg-gray-800 text-white"
+        placeholder="Type your message..."
+        className="flex-1 p-3 border border-gray-300 dark:border-gray-700 rounded-lg"
+
         autoFocus
       />
-      <button 
+      <button
         onClick={handleSendMessage}
         className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg cursor-pointer"
       >
