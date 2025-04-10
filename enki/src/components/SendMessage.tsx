@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import OpenAI from "openai";
+
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
   dangerouslyAllowBrowser: true,
@@ -67,11 +68,21 @@ export function SendMessage({ messages, setMessages }: SendMessageProps) {
          ...updatedHistory,
          { role: "assistant", content: response.output_text },
        ]);
+
        setInputMessage("");
   
-       // Save conversation history to file
-       //const jsonHistory = JSON.stringify(updatedHistory, null, 2);
-       //fs.writeFileSync('conversationHistory.json', jsonHistory, 'utf8');
+       try {
+        const moduleID = "technoethics";
+        const topicID = "emergent-technology";
+        await fetch(`/api/modules/${moduleID}/chat/${topicID}`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ conversationHistory: updatedHistory }),
+      });
+      console.log(updatedHistory);
+      } catch (error) {
+        console.error("Error saving conversation history:", error);
+      }
   
   
      };

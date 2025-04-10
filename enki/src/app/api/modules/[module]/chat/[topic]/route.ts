@@ -61,3 +61,41 @@ export async function GET(
     );
   }
 }
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { module: string; topic: string } }
+) {
+  try {
+    const body = await request.json();
+    const { conversationHistory } = body;
+
+    const { module: moduleName, topic: topicName } = await params;
+
+    // Build path to save the JSON file
+    const dirPath = path.join(
+      process.cwd(),
+      "data",
+      "modules",
+      moduleName,
+      "chat"
+    );
+    const filePath = path.join(dirPath, `${topicName}.json`);
+
+    // Ensure the directory exists
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+
+    // Write conversation history to the JSON file
+    fs.writeFileSync(filePath, JSON.stringify({ messages: conversationHistory }, null, 2), "utf8");
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error saving conversation history:", error);
+    return NextResponse.json(
+      { error: "Failed to save conversation history" },
+      { status: 500 }
+    );
+  }
+}
