@@ -142,6 +142,7 @@ export function ChatInterface({
             disabled={isLoading}
             moduleID={moduleID}
             topicID={selectedTopic}
+            studentId={studentId} // Add this line to pass the student ID
           />
         </main>
       </div>

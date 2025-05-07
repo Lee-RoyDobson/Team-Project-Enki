@@ -17,6 +17,7 @@ interface SendMessageProps {
   disabled?: boolean;
   moduleID: string;
   topicID: string;
+  studentId: string;
 }
 
 export function SendMessage({
@@ -25,6 +26,7 @@ export function SendMessage({
   disabled,
   moduleID,
   topicID,
+  studentId,
 }: SendMessageProps) {
   const [inputMessage, setInputMessage] = useState("");
   const [conversationHistory, setConversationHistory] = useState([
@@ -48,6 +50,32 @@ export function SendMessage({
     setMessages([]);
   }, [topicID, setMessages]);
 
+  // Save a message to the API
+  const saveMessageToAPI = async (message: Message) => {
+    try {
+      const saveResponse = await fetch("/api/chat/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          studentId: studentId,
+          topic: topicID,
+          message: message,
+        }),
+      });
+
+      if (!saveResponse.ok) {
+        throw new Error(`Failed to save message: ${saveResponse.status}`);
+      }
+
+      const saveData = await saveResponse.json();
+      console.log("Message saved successfully:", saveData);
+    } catch (error) {
+      console.error("Error saving message:", error);
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputMessage(e.target.value);
   };
@@ -55,17 +83,27 @@ export function SendMessage({
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
-    // Add user message to chat
-    const newMessages = [...messages, { sender: "You", content: inputMessage }];
+    // Create the user message
+    const userMessage = { sender: "You", content: inputMessage };
 
+    // Add user message to chat UI
+    const newMessages = [...messages, userMessage];
     setMessages(newMessages);
 
+    // Save user message to API
+    await saveMessageToAPI(userMessage);
+
+    // Update conversation history for OpenAI
     const updatedHistory = [
       ...conversationHistory,
       { role: "user", content: inputMessage },
     ];
     setConversationHistory(updatedHistory);
 
+    // Clear input field
+    setInputMessage("");
+
+    // Get AI response
     const response = await openai.responses.create({
       model: "gpt-3.5-turbo",
       input: updatedHistory
@@ -84,29 +122,20 @@ export function SendMessage({
       store: true,
     });
 
-    // Add AI response to chat
+    // Create the AI message
     const aiMessage = { sender: "Enki", content: response.output_text };
+
+    // Add AI response to chat UI
     setMessages([...newMessages, aiMessage]);
 
+    // Save AI message to API
+    await saveMessageToAPI(aiMessage);
+
     // Update conversation history with AI response
-    const completeHistory = [
+    setConversationHistory([
       ...updatedHistory,
       { role: "assistant", content: response.output_text },
-    ];
-    setConversationHistory(completeHistory);
-
-    setInputMessage("");
-
-    try {
-      await fetch(`/api/modules/${moduleID}/chat/${topicID}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ conversationHistory: completeHistory }),
-      });
-      console.log(completeHistory);
-    } catch (error) {
-      console.error("Error saving conversation history:", error);
-    }
+    ]);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -125,10 +154,12 @@ export function SendMessage({
         placeholder="Type your message..."
         className="flex-1 p-3 border border-gray-300 dark:border-gray-700 rounded-lg"
         autoFocus
+        disabled={disabled}
       />
       <button
         onClick={handleSendMessage}
         className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer"
+        disabled={disabled}
       >
         Send
       </button>
