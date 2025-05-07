@@ -7,7 +7,7 @@ const openai = new OpenAI({
 });
 
 type Message = {
-  sender: string;
+  role: string; // Changed from sender to role
   content: string;
 };
 
@@ -84,7 +84,7 @@ export function SendMessage({
     if (!inputMessage.trim()) return;
 
     // Create the user message
-    const userMessage = { sender: "You", content: inputMessage };
+    const userMessage = { role: "user", content: inputMessage }; // Changed sender to role
 
     // Add user message to chat UI
     const newMessages = [...messages, userMessage];
@@ -123,7 +123,7 @@ export function SendMessage({
     });
 
     // Create the AI message
-    const aiMessage = { sender: "Enki", content: response.output_text };
+    const aiMessage = { role: "assistant", content: response.output_text }; // Changed sender to role
 
     // Add AI response to chat UI
     setMessages([...newMessages, aiMessage]);

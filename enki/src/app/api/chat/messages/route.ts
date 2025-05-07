@@ -18,7 +18,6 @@ export async function GET(request: NextRequest) {
   }
 
   // Format the topic name to match how it's stored in the database
-  // This should be exactly as it appears in MongoDB
   const formattedTopic = topic;
 
   // Connect to MongoDB
@@ -71,7 +70,7 @@ export async function GET(request: NextRequest) {
         {
           messages: [
             {
-              sender: "Enki",
+              role: "assistant",
               content: `Welcome to ${topic}! How can I help you?`,
             },
           ],
@@ -109,7 +108,7 @@ export async function GET(request: NextRequest) {
         {
           messages: [
             {
-              sender: "Enki",
+              role: "assistant",
               content: `Welcome to ${topic}! How can I help you?`,
             },
           ],
@@ -210,7 +209,7 @@ export async function POST(request: NextRequest) {
           {
             [topic]: [
               {
-                sender: "Enki",
+                role: "assistant",
                 content: `Welcome to ${topic}! How can I help you?`,
               },
               message,
