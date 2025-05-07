@@ -15,15 +15,17 @@ interface SendMessageProps {
   messages: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   disabled?: boolean;
+  moduleID: string;
+  topicID: string;
 }
 
-export function SendMessage({ messages, setMessages }: SendMessageProps) {
+export function SendMessage({ messages, setMessages, disabled, moduleID, topicID }: SendMessageProps) {
   const [inputMessage, setInputMessage] = useState("");
   const [conversationHistory, setConversationHistory] = useState([
     {
       role: "system",
       content:
-        "Have a conversation with the user about Technoethics and Emergent Technology. Do not deviate from this.",
+      `Have a conversation with the user about ${topicID}. Do not deviate from this.`,
     },
   ]);
 
