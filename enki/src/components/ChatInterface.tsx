@@ -9,6 +9,7 @@ import { SendMessage } from "@/components/SendMessage";
 type Message = {
   sender: string;
   content: string;
+  role?: string;
 };
 
 interface ChatInterfaceProps {
@@ -58,7 +59,18 @@ export function ChatInterface({
       }
 
       const data = await response.json();
-      setMessages(data.messages || []);
+      // Filter out system messages and transform remaining message senders for display
+      const transformedMessages = (data.messages || [])
+        .filter((msg: Message) => msg.role !== "system") // Filter out system messages
+        .map((msg: Message) => ({
+          ...msg,
+          sender:
+            (msg.sender && msg.sender.toLowerCase() === "assistant") ||
+            msg.role === "assistant"
+              ? "Enki"
+              : "You",
+        }));
+      setMessages(transformedMessages);
     } catch (error) {
       console.error("Error loading messages:", error);
       // Fallback to default message
