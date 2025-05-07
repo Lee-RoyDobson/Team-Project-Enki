@@ -6,10 +6,11 @@ import { TopicButton } from "@/components/TopicButton";
 import { MessageBubble } from "@/components/MessageBubble";
 import { SendMessage } from "@/components/SendMessage";
 
+// Unified message type that works with both display and API
 type Message = {
-  sender: string;
+  role: string;
   content: string;
-  role?: string;
+  sender?: string; // For backward compatibility with UI components
 };
 
 interface ChatInterfaceProps {
@@ -59,23 +60,26 @@ export function ChatInterface({
       }
 
       const data = await response.json();
-      // Filter out system messages and transform remaining message senders for display
+
+      // Transform messages to include both role and sender fields for compatibility
       const transformedMessages = (data.messages || [])
-        .filter((msg: Message) => msg.role !== "system") // Filter out system messages
-        .map((msg: Message) => ({
-          ...msg,
-          sender:
-            (msg.sender && msg.sender.toLowerCase() === "assistant") ||
-            msg.role === "assistant"
-              ? "Enki"
-              : "You",
+        .filter((msg: any) => msg.role !== "system") // Filter out system messages
+        .map((msg: any) => ({
+          role: msg.role,
+          content: msg.content,
+          sender: msg.role === "assistant" ? "Enki" : "You",
         }));
+
       setMessages(transformedMessages);
     } catch (error) {
       console.error("Error loading messages:", error);
       // Fallback to default message
       setMessages([
-        { sender: "Enki", content: `Welcome to ${topic}! How can I help you?` },
+        {
+          role: "assistant",
+          content: `Welcome to ${topic}! How can I help you?`,
+          sender: "Enki",
+        },
       ]);
     } finally {
       setIsLoading(false);
@@ -142,7 +146,7 @@ export function ChatInterface({
             disabled={isLoading}
             moduleID={moduleID}
             topicID={selectedTopic}
-            studentId={studentId} // Add this line to pass the student ID
+            studentId={studentId}
           />
         </main>
       </div>
