@@ -126,9 +126,18 @@ export function SendMessage({
       const conversationHistory = getConversationHistory(userMessage);
 
       // Format conversation history for responses API
-      const formattedInput = conversationHistory
-        .map((msg) => `${msg.role}: ${msg.content}`)
-        .join("\n");
+      const formattedInput = conversationHistory.map((msg) => ({
+        role: msg.role,
+        content: [
+          {
+            type:
+              msg.role === "user" || msg.role === "system"
+                ? "input_text"
+                : "output_text",
+            text: msg.content,
+          },
+        ],
+      }));
 
       console.log("Sending to OpenAI:", formattedInput);
 
