@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
@@ -19,15 +19,34 @@ interface SendMessageProps {
   topicID: string;
 }
 
-export function SendMessage({ messages, setMessages, disabled, moduleID, topicID }: SendMessageProps) {
+export function SendMessage({
+  messages,
+  setMessages,
+  disabled,
+  moduleID,
+  topicID,
+}: SendMessageProps) {
   const [inputMessage, setInputMessage] = useState("");
   const [conversationHistory, setConversationHistory] = useState([
     {
       role: "system",
-      content:
-      `Have a conversation with the user about ${topicID}. Do not deviate from this.`,
+      content: `Have a conversation with the user about ${topicID}. Do not deviate from this.`,
     },
   ]);
+
+  // Reset conversation history when topicID changes
+  useEffect(() => {
+    // Reset conversation history with the new topic
+    setConversationHistory([
+      {
+        role: "system",
+        content: `Have a conversation with the user about ${topicID}. Do not deviate from this.`,
+      },
+    ]);
+
+    // Also reset messages displayed in the UI
+    setMessages([]);
+  }, [topicID, setMessages]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputMessage(e.target.value);
@@ -79,8 +98,6 @@ export function SendMessage({ messages, setMessages, disabled, moduleID, topicID
     setInputMessage("");
 
     try {
-      const moduleID = "technoethics";
-      const topicID = "emergent-technology";
       await fetch(`/api/modules/${moduleID}/chat/${topicID}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
