@@ -40,6 +40,8 @@ export function ChatInterface({
   // Add student ID state - in a real app, you'd get this from authentication
   const [studentId, setStudentId] = useState("100597844"); // Default student ID for testing
 
+  const moduleID = "technoethics";
+
   // Load messages for a topic
   const loadMessagesForTopic = async (topic: string) => {
     setIsLoading(true);
@@ -126,6 +128,8 @@ export function ChatInterface({
             messages={messages}
             setMessages={setMessages}
             disabled={isLoading}
+            moduleID={moduleID}
+            topicID={selectedTopic}
           />
         </main>
       </div>
