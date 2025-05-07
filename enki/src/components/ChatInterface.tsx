@@ -6,9 +6,11 @@ import { TopicButton } from "@/components/TopicButton";
 import { MessageBubble } from "@/components/MessageBubble";
 import { SendMessage } from "@/components/SendMessage";
 
+// Unified message type that works with both display and API
 type Message = {
-  sender: string;
+  role: string;
   content: string;
+  sender?: string; // For backward compatibility with UI components
 };
 
 interface ChatInterfaceProps {
@@ -58,12 +60,26 @@ export function ChatInterface({
       }
 
       const data = await response.json();
-      setMessages(data.messages || []);
+
+      // Transform messages to include both role and sender fields for compatibility
+      const transformedMessages = (data.messages || [])
+        .filter((msg: any) => msg.role !== "system") // Filter out system messages
+        .map((msg: any) => ({
+          role: msg.role,
+          content: msg.content,
+          sender: msg.role === "assistant" ? "Enki" : "You",
+        }));
+
+      setMessages(transformedMessages);
     } catch (error) {
       console.error("Error loading messages:", error);
       // Fallback to default message
       setMessages([
-        { sender: "Enki", content: `Welcome to ${topic}! How can I help you?` },
+        {
+          role: "assistant",
+          content: `Welcome to ${topic}! How can I help you?`,
+          sender: "Enki",
+        },
       ]);
     } finally {
       setIsLoading(false);
@@ -130,6 +146,7 @@ export function ChatInterface({
             disabled={isLoading}
             moduleID={moduleID}
             topicID={selectedTopic}
+            studentId={studentId}
           />
         </main>
       </div>

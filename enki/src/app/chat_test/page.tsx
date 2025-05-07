@@ -49,7 +49,7 @@ export default function ChatPage() {
       initialTopic={topicStrings.length > 0 ? topicStrings[0] : ""}
       topics={topicStrings}
       title="5CM504 ​​Legal, Ethical and Sustainability Issues"
-      backLink="/"
+      backLink="/student/dashboard"
       dataid="5CM504"
     />
   );

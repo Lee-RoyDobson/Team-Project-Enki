@@ -18,7 +18,6 @@ export async function GET(request: NextRequest) {
   }
 
   // Format the topic name to match how it's stored in the database
-  // This should be exactly as it appears in MongoDB
   const formattedTopic = topic;
 
   // Connect to MongoDB
@@ -71,7 +70,7 @@ export async function GET(request: NextRequest) {
         {
           messages: [
             {
-              sender: "Enki",
+              role: "assistant",
               content: `Welcome to ${topic}! How can I help you?`,
             },
           ],
@@ -109,7 +108,7 @@ export async function GET(request: NextRequest) {
         {
           messages: [
             {
-              sender: "Enki",
+              role: "assistant",
               content: `Welcome to ${topic}! How can I help you?`,
             },
           ],
@@ -128,5 +127,122 @@ export async function GET(request: NextRequest) {
     );
   } finally {
     await client.close();
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { studentId, topic, message } = body;
+
+    console.log("POST endpoint called with:", { studentId, topic, message });
+
+    if (!studentId || !topic || !message) {
+      return NextResponse.json(
+        { error: "Missing required parameters" },
+        { status: 400 }
+      );
+    }
+
+    // Connect to MongoDB
+    const uri = process.env.MONGODB_URI;
+    if (!uri) {
+      return NextResponse.json(
+        { error: "Database connection string is not configured" },
+        { status: 500 }
+      );
+    }
+
+    const client = new MongoClient(uri);
+
+    try {
+      await client.connect();
+      console.log("Connected successfully to MongoDB");
+
+      const database = client.db("Students");
+      const collection = database.collection("5CM504");
+
+      // Find the student document
+      let studentDoc = await collection.findOne({ student_id: studentId });
+
+      // If not found with string, try as number
+      if (!studentDoc) {
+        studentDoc = await collection.findOne({
+          student_id: Number(studentId),
+        });
+      }
+
+      if (!studentDoc) {
+        // Create a new student document if it doesn't exist
+        const newStudentDoc = {
+          student_id: isNaN(Number(studentId)) ? studentId : Number(studentId),
+          topics: [
+            {
+              [topic]: [
+                {
+                  role: "assistant",
+                  content: `Welcome to ${topic}! How can I help you?`,
+                },
+                message,
+              ],
+            },
+          ],
+        };
+
+        await collection.insertOne(newStudentDoc);
+
+        return NextResponse.json(
+          { success: true, message: "New student and message created" },
+          { status: 201 }
+        );
+      }
+
+      // Find if the topic exists
+      const topicIndex = studentDoc.topics?.findIndex(
+        (t: any) => Object.keys(t)[0] === topic
+      );
+
+      if (topicIndex === -1 || topicIndex === undefined) {
+        // Topic doesn't exist, create it
+        const updatedTopics = [
+          ...(studentDoc.topics || []),
+          {
+            [topic]: [
+              {
+                role: "assistant",
+                content: `Welcome to ${topic}! How can I help you?`,
+              },
+              message,
+            ],
+          },
+        ];
+
+        await collection.updateOne(
+          { _id: studentDoc._id },
+          { $set: { topics: updatedTopics } }
+        );
+      } else {
+        // Topic exists, append the message
+        const updatePath = `topics.${topicIndex}.${topic}`;
+
+        await collection.updateOne(
+          { _id: studentDoc._id },
+          { $push: { [updatePath]: message } }
+        );
+      }
+
+      return NextResponse.json(
+        { success: true, message: "Message added successfully" },
+        { status: 200 }
+      );
+    } finally {
+      await client.close();
+    }
+  } catch (error) {
+    console.error("Error in POST request:", error);
+    return NextResponse.json(
+      { error: "Failed to update messages", details: String(error) },
+      { status: 500 }
+    );
   }
 }
