@@ -6,7 +6,7 @@ import ParticlesBackground from '@/components/ParticlesBackground';
 export default function About() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-full bg-gradient-to-b from-gray-900 to-gray-800 relative overflow-hidden">
-      {/* Particles background */}
+
       <ParticlesBackground />
       
       <main className="flex flex-col items-center justify-center gap-8 p-8 text-center z-10 relative max-w-4xl">
@@ -16,23 +16,21 @@ export default function About() {
         
         <div className="text-lg text-gray-300 space-y-6">
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies tincidunt, 
-            nunc nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl. Enki is an innovative educational platform 
-            designed to revolutionize the way students learn and engage with content.
+            University of Derby - Team Project - 2025
           </p>
           
           <h2 className="text-2xl font-semibold text-blue-300 mt-8 mb-2">Our Mission</h2>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum consequat odio sit amet quam 
-            tincidunt, ac aliquam magna facilisis. Phasellus facilisis, justo non pulvinar tincidunt, 
-            nisl lectus luctus libero, vitae varius nisl nisl sit amet nisl.
+            Lorum ipsum dolor sit amet, consectetur adipiscing elit. 
+            Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           </p>
           
           <h2 className="text-2xl font-semibold text-blue-300 mt-8 mb-2">Our Team</h2>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum consequat odio sit amet quam 
-            tincidunt, ac aliquam magna facilisis. Phasellus facilisis, justo non pulvinar tincidunt, 
-            nisl lectus luctus libero, vitae varius nisl nisl sit amet nisl.
+            Lee-Roy Dobson, Hayden Hefford and Liam Hefford
           </p>
           
           <div className="mt-8">

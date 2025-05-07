@@ -13,7 +13,7 @@ export default function StudentDashboard() {
     const notification = sessionStorage.getItem('topicNotification');
     if (notification) {
       toast.success(notification, {
-        position: "top-center", // Changed from "top-right" to "top-center"
+        position: "top-center",
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
