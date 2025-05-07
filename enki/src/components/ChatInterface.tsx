@@ -101,7 +101,7 @@ export function ChatInterface({
       <div className="flex-1 flex gap-4">
 
         {/* Topics sidebar */}
-        <div className="w-64 overflow-y-auto p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
+        <div className="w-64 overflow-y-auto p-4 border border-gray-700 rounded-lg bg-gray-800">
           <h2 className="font-bold text-lg mb-4">Topics</h2>
 
           <ul className="space-y-2">
@@ -123,7 +123,7 @@ export function ChatInterface({
           <h2 className="text-xl font-semibold mb-4">{selectedTopic}</h2>
 
           {/* Chat messages window */}
-          <div className="flex-none overflow-y-auto mb-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800 h-[70vh]">
+          <div className="flex-none overflow-y-auto mb-4 p-4 border border-gray-700 rounded-lg bg-gray-800 h-[70vh]">
             {isLoading ? (
               <div className="text-center py-4">Loading messages...</div>
             ) : (
@@ -135,7 +135,6 @@ export function ChatInterface({
 
           {/* Input field */}
           <SendMessage
-
             messages={messages}
             setMessages={setMessages}
             disabled={isLoading}

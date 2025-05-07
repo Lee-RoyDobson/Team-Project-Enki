@@ -42,7 +42,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800 p-4 relative overflow-hidden">
-      {/* Particles background */}
+
       <ParticlesBackground />
       
       <div className="w-full max-w-md rounded-lg bg-gray-800/50 backdrop-filter backdrop-blur-md border border-gray-700/30 p-8 shadow-lg z-10">
