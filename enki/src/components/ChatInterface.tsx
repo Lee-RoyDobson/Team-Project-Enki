@@ -37,31 +37,22 @@ export function ChatInterface({
   const [selectedTopic, setSelectedTopic] = useState(initialTopic);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  // Add student ID state - in a real app, you'd get this from authentication
+  const [studentId, setStudentId] = useState("100597844"); // Default student ID for testing
 
   // Load messages for a topic
   const loadMessagesForTopic = async (topic: string) => {
     setIsLoading(true);
     try {
-      // Use dataid if provided, otherwise format the title
-      const moduleId = dataid || title.toLowerCase().replace(/\s+/g, "-");
-
-      // Convert topic name to a filename-friendly format
-      const topicFileName = topic.toLowerCase().replace(/\s+/g, "-");
-
-      // Fetch the JSON file for this topic using moduleId in the path
+      // Fetch messages from the database using our new API endpoint
       const response = await fetch(
-        `/api/modules/${moduleId}/chat/${topicFileName}`
+        `/api/chat/messages?studentId=${studentId}&topic=${encodeURIComponent(
+          topic
+        )}`
       );
 
       if (!response.ok) {
-        // If no specific JSON found, use default welcome message
-        setMessages([
-          {
-            sender: "Enki",
-            content: `Welcome to ${topic}! How can I help you?`,
-          },
-        ]);
-        return;
+        throw new Error(`HTTP error ${response.status}`);
       }
 
       const data = await response.json();
@@ -80,7 +71,7 @@ export function ChatInterface({
   // Load initial messages when component mounts
   useEffect(() => {
     loadMessagesForTopic(selectedTopic);
-  }, []);
+  }, [selectedTopic, studentId]); // Add dependencies to reload when they change
 
   const handleTopicSelect = (topic: string) => {
     setSelectedTopic(topic);
@@ -88,7 +79,7 @@ export function ChatInterface({
   };
 
   return (
-    <div className="min-h-screen p-8 pt-20 flex flex-col"> 
+    <div className="min-h-screen p-8 pt-20 flex flex-col">
       <header className="mb-4">
         <h1 className="text-3xl font-bold">{title}</h1>
         {showBackButton && (
@@ -99,13 +90,11 @@ export function ChatInterface({
       </header>
 
       <div className="flex-1 flex gap-4">
-
         {/* Topics sidebar */}
         <div className="w-64 overflow-y-auto p-4 border border-gray-700 rounded-lg bg-gray-800">
           <h2 className="font-bold text-lg mb-4">Topics</h2>
 
           <ul className="space-y-2">
-
             {topics.map((topic) => (
               <TopicButton
                 key={topic}
@@ -118,7 +107,6 @@ export function ChatInterface({
         </div>
 
         <main className="flex-1 flex flex-col">
-
           {/* Topic title */}
           <h2 className="text-xl font-semibold mb-4">{selectedTopic}</h2>
 
