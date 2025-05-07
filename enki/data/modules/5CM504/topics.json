@@ -1,0 +1,12 @@
+{
+  "topics": [
+    {
+      "topic": "Technnoethics and Emergent Technologies.",
+      "startMessage": "What do you know about technnoethics already?"
+    },
+    {
+      "topic": "Legality Versus Ethics.",
+      "startMessage": "Do you know the difference between legality and ethics?"
+    }
+  ]
+}

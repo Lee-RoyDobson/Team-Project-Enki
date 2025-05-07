@@ -1,0 +1,36 @@
+{
+  "5CM504": [
+    {
+      "topics": [
+        {
+          "topic": "Technnoethics and Emergent Technologies.",
+          "startMessage": "What do you know about technnoethics already?"
+        },
+        {
+          "topic": "Legality Versus Ethics.",
+          "startMessage": "Do you know the difference between legality and ethics?"
+        }
+      ]
+    },
+    {
+      "chats": [
+        {
+          "messages": [
+            {
+              "sender": "Enki",
+              "content": "Welcome to TEST TOPIC 1! How can I help you today?"
+            },
+            {
+              "sender": "User",
+              "content": "Can you tell me what this topic covers?"
+            },
+            {
+              "sender": "Enki",
+              "content": "This topic covers the ethics innit"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
