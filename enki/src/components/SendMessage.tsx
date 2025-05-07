@@ -3,11 +3,11 @@ import OpenAI from "openai";
 
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true,
+  dangerouslyAllowBrowser: true, // exposes key to frontend, needs changing in future
 });
 
 type Message = {
-  sender: string;
+  sender: string; // student, Enki
   content: string;
 };
 
@@ -34,9 +34,7 @@ export function SendMessage({
     },
   ]);
 
-  // Reset conversation history when topicID changes
-  useEffect(() => {
-    // Reset conversation history with the new topic
+  useEffect(() => { // updates topicID when topic changes
     setConversationHistory([
       {
         role: "system",
@@ -44,8 +42,7 @@ export function SendMessage({
       },
     ]);
 
-    // Also reset messages displayed in the UI
-    setMessages([]);
+    setMessages([]); // Also reset messages displayed in the UI
   }, [topicID, setMessages]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,8 +52,7 @@ export function SendMessage({
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
-    // Add user message to chat
-    const newMessages = [...messages, { sender: "You", content: inputMessage }];
+    const newMessages = [...messages, { sender: "You", content: inputMessage }]; // Add user message to chat
 
     setMessages(newMessages);
 
@@ -67,7 +63,7 @@ export function SendMessage({
     setConversationHistory(updatedHistory);
 
     const response = await openai.responses.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-3.5-turbo", // 3.5 for development, change for production
       input: updatedHistory
         .map((msg) => `${msg.role}: ${msg.content}`)
         .join("\n"),
@@ -84,11 +80,10 @@ export function SendMessage({
       store: true,
     });
 
-    // Add AI response to chat
-    const aiMessage = { sender: "Enki", content: response.output_text };
+    const aiMessage = { sender: "Enki", content: response.output_text }; // adds AI response to chat
     setMessages([...newMessages, aiMessage]);
 
-    // Update conversation history with AI response
+    // updates chat history with AI response
     const completeHistory = [
       ...updatedHistory,
       { role: "assistant", content: response.output_text },
