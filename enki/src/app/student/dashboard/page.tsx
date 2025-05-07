@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation'
 import React from 'react'
-import Particles from '@/components/ParticlesBackground'
 import ParticlesBackground from '@/components/ParticlesBackground'
 
 export default function StudentDashboard() {
@@ -67,15 +66,11 @@ export default function StudentDashboard() {
   ]
 
   return (
-    <div className="min-h-screen p-8 pt-20 relative">
+    <div className="min-h-screen p-8 pt-20 relative bg-gradient-to-b from-gray-900 to-gray-800 overflow-hidden">
 
       <ParticlesBackground />
 
-      <br></br>
-
-      <h1 className="mb-8 text-3xl font-bold text-center">My Subjects</h1>
-      
-      <br></br>
+      <h1 className="mb-8 text-3xl font-bold text-center text-gray-100">My Subjects</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
         {subjects.map((subject) => (
