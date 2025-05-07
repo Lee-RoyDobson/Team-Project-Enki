@@ -41,7 +41,6 @@ export function ChatInterface({
   const [studentId, setStudentId] = useState("100597844"); // Default student ID for testing
 
   const moduleID = "technoethics";
-  const topicID = selectedTopic;
 
   // Load messages for a topic
   const loadMessagesForTopic = async (topic: string) => {
@@ -130,7 +129,7 @@ export function ChatInterface({
             setMessages={setMessages}
             disabled={isLoading}
             moduleID={moduleID}
-            topicID={topicID}
+            topicID={selectedTopic}
           />
         </main>
       </div>
