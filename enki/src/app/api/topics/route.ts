@@ -58,3 +58,66 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { title, initialMessage, moduleId = "5CM504" } = body;
+
+    if (!title) {
+      return NextResponse.json(
+        { error: "Topic title is required" },
+        { status: 400 }
+      );
+    }
+
+    // Get a connected MongoDB client
+    const mongoClient = await clientPromise;
+
+    if (!(mongoClient instanceof MongoClient)) {
+      throw new Error("Invalid MongoDB client received");
+    }
+
+    const db = mongoClient.db("Modules");
+    const collection = db.collection(moduleId);
+
+    // Check if topic already exists to avoid duplicates
+    const existingTopic = await collection.findOne({ topic: title });
+    if (existingTopic) {
+      return NextResponse.json(
+        { error: "A topic with this title already exists" },
+        { status: 409 }
+      );
+    }
+
+    // Create the new topic document
+    const newTopic = {
+      topic: title,
+      startMessage:
+        initialMessage || `Welcome to ${title}! How can I help you?`,
+      createdAt: new Date(),
+    };
+
+    const result = await collection.insertOne(newTopic);
+
+    return NextResponse.json(
+      {
+        success: true,
+        topicId: result.insertedId,
+        message: "Topic created successfully",
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Error creating topic:", error);
+
+    const errorMessage =
+      process.env.NODE_ENV === "development"
+        ? `Failed to create topic: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`
+        : "Failed to create topic";
+
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
+  }
+}
