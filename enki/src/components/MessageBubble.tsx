@@ -18,7 +18,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
       <div className={`
         p-3 rounded-lg 
         ${isEnki ? "bg-blue-900" : "bg-gray-700"}
-      `}>
+      `}
+      style={{ whiteSpace: "pre-wrap" }}
+      >
         {message.content}
       </div>
     </div>
