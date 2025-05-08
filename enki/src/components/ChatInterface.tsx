@@ -40,7 +40,7 @@ export function ChatInterface({
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   // Add student ID state - in a real app, you'd get this from authentication
-  const [studentId, setStudentId] = useState("100597844"); // Default student ID for testing
+  const [studentId, setStudentId] = useState("123456789"); // Default student ID for testing
 
   const moduleID = "technoethics";
 
