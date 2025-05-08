@@ -1,18 +1,30 @@
+/**
+ * SendMessage Component
+ *
+ * Handles user message input, submission, and retrieves AI responses from OpenAI.
+ * Also manages saving messages to the backend API.
+ */
 import React, { useState } from "react";
 import OpenAI from "openai";
 
+// Initialize OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
   dangerouslyAllowBrowser: true,
 });
 
-// Update the Message type to match what's used in ChatInterface
+/**
+ * Message type definition consistent with ChatInterface component.
+ */
 type Message = {
   role: string;
   content: string;
   sender?: string; // For backward compatibility
 };
 
+/**
+ * Props interface for the SendMessage component.
+ */
 interface SendMessageProps {
   messages: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
@@ -22,6 +34,17 @@ interface SendMessageProps {
   studentId: string;
 }
 
+/**
+ * Renders a message input field and send button, handles message submission logic.
+ * Processes user messages, sends them to OpenAI for responses, and updates the UI.
+ *
+ * @param messages - Current conversation messages
+ * @param setMessages - State setter for messages
+ * @param disabled - Whether the input is disabled
+ * @param moduleID - ID of the current module
+ * @param topicID - ID of the current topic
+ * @param studentId - ID of the current student
+ */
 export function SendMessage({
   messages,
   setMessages,
@@ -33,7 +56,12 @@ export function SendMessage({
   const [inputMessage, setInputMessage] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Prepare conversation history from current messages
+  /**
+   * Prepares conversation history for OpenAI, including system, user, and assistant messages.
+   *
+   * @param additionalMessage - Optional new message to include in history
+   * @returns Array of messages formatted for OpenAI
+   */
   const getConversationHistory = (additionalMessage?: Message) => {
     // Start with system message
     const history = [
@@ -64,7 +92,11 @@ export function SendMessage({
     return history;
   };
 
-  // Save a message to the API
+  /**
+   * Saves a message to the backend API.
+   *
+   * @param message - The message to save
+   */
   const saveMessageToAPI = async (message: Message) => {
     // Create a copy of the message for API storage
     const messageForAPI = {
@@ -96,10 +128,17 @@ export function SendMessage({
     }
   };
 
+  /**
+   * Handles changes to the input field.
+   */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputMessage(e.target.value);
   };
 
+  /**
+   * Handles the send message action.
+   * Adds user message to the UI, sends to API, retrieves AI response.
+   */
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isProcessing) return;
     setIsProcessing(true);
@@ -190,6 +229,9 @@ export function SendMessage({
     }
   };
 
+  /**
+   * Handles Enter key press in the input field.
+   */
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSendMessage();

@@ -1,3 +1,9 @@
+/**
+ * ChatInterface Component
+ *
+ * A comprehensive chat interface that displays messages between a student and Enki AI.
+ * Provides topic selection functionality and message sending capabilities.
+ */
 "use client";
 
 import Link from "next/link";
@@ -6,13 +12,19 @@ import { TopicButton } from "@/components/TopicButton";
 import { MessageBubble } from "@/components/MessageBubble";
 import { SendMessage } from "@/components/SendMessage";
 
-// Unified message type that works with both display and API
+/**
+ * Unified message type that works with both display and API.
+ * Includes role for API compatibility and sender for UI display.
+ */
 type Message = {
   role: string;
   content: string;
   sender?: string; // For backward compatibility with UI components
 };
 
+/**
+ * Props interface for the ChatInterface component.
+ */
 interface ChatInterfaceProps {
   initialTopic?: string;
   topics?: string[];
@@ -22,6 +34,16 @@ interface ChatInterfaceProps {
   dataid?: string;
 }
 
+/**
+ * ChatInterface component that provides a complete chat experience with topic selection.
+ *
+ * @param initialTopic - The default selected topic
+ * @param topics - Array of available topics to display
+ * @param showBackButton - Whether to show the back navigation button
+ * @param backLink - URL for the back button navigation
+ * @param title - The title displayed at the top of the interface
+ * @param dataid - Data identifier for the chat session
+ */
 export function ChatInterface({
   initialTopic = "TEST TOPIC 1",
   topics = [
@@ -39,16 +61,20 @@ export function ChatInterface({
   const [selectedTopic, setSelectedTopic] = useState(initialTopic);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  // Add student ID state - in a real app, you'd get this from authentication
-  const [studentId, setStudentId] = useState("100597844"); // Default student ID for testing
+  // Student ID state - would be retrieved from authentication in production
+  const [studentId, setStudentId] = useState("100597844");
 
   const moduleID = "technoethics";
 
-  // Load messages for a topic
+  /**
+   * Loads messages for the selected topic from the API.
+   *
+   * @param topic - The topic to load messages for
+   */
   const loadMessagesForTopic = async (topic: string) => {
     setIsLoading(true);
     try {
-      // Fetch messages from the database using our new API endpoint
+      // Fetch messages from the database using our API endpoint
       const response = await fetch(
         `/api/chat/messages?studentId=${studentId}&topic=${encodeURIComponent(
           topic
@@ -73,7 +99,7 @@ export function ChatInterface({
       setMessages(transformedMessages);
     } catch (error) {
       console.error("Error loading messages:", error);
-      // Fallback to default message
+      // Fallback to default welcome message
       setMessages([
         {
           role: "assistant",
@@ -86,11 +112,16 @@ export function ChatInterface({
     }
   };
 
-  // Load initial messages when component mounts
+  // Load initial messages when component mounts or when topic/student changes
   useEffect(() => {
     loadMessagesForTopic(selectedTopic);
-  }, [selectedTopic, studentId]); // Add dependencies to reload when they change
+  }, [selectedTopic, studentId]);
 
+  /**
+   * Handles topic selection, updating state and loading relevant messages.
+   *
+   * @param topic - The newly selected topic
+   */
   const handleTopicSelect = (topic: string) => {
     setSelectedTopic(topic);
     loadMessagesForTopic(topic);
@@ -128,7 +159,7 @@ export function ChatInterface({
           {/* Topic title */}
           <h2 className="text-xl font-semibold mb-4">{selectedTopic}</h2>
 
-          {/* Chat messages window */}
+          {/* Chat messages container */}
           <div className="flex-none overflow-y-auto mb-4 p-4 border border-gray-700 rounded-lg bg-gray-800 h-[70vh]">
             {isLoading ? (
               <div className="text-center py-4">Loading messages...</div>
@@ -139,7 +170,7 @@ export function ChatInterface({
             )}
           </div>
 
-          {/* Input field */}
+          {/* Message input component */}
           <SendMessage
             messages={messages}
             setMessages={setMessages}

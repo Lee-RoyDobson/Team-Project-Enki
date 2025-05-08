@@ -1,38 +1,63 @@
-'use client'
+/**
+ * ParticlesBackground Component
+ *
+ * Renders an interactive particle animation background with a smooth fade-in effect.
+ * Uses tsparticles library to create a network of connected particles.
+ */
+"use client";
 
 import { useCallback, useEffect, useState } from "react";
 import Particles from "react-tsparticles";
 import { loadSlim } from "tsparticles-slim";
 import type { Engine } from "tsparticles-engine";
 
+/**
+ * Renders a full-screen animated particles background with fade-in effect.
+ * Uses client-side rendering to ensure proper initialization.
+ */
 export default function ParticlesBackground() {
-  // State to control particle rendering
+  // State to control client-side particle rendering
   const [isClient, setIsClient] = useState(false);
   // State to control fade-in animation
   const [isVisible, setIsVisible] = useState(false);
-  
+
+  // Initialize client-side rendering and fade-in animation
   useEffect(() => {
     setIsClient(true);
-    // Add a small delay before starting the fade-in
+    // Add a small delay before starting the fade-in for smoother transition
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 300);
-    
+
     return () => clearTimeout(timer);
   }, []);
 
+  /**
+   * Initialize the particles engine with slim configuration.
+   *
+   * @param engine - The tsparticles engine instance
+   */
   const particlesInit = useCallback(async (engine: Engine) => {
     await loadSlim(engine);
   }, []);
 
+  /**
+   * Callback executed when particles container is loaded.
+   * Can be used for post-initialization tasks.
+   *
+   * @param container - The particles container
+   */
   const particlesLoaded = useCallback(async (container: any) => {
+    // Container loaded - can perform additional actions if needed
   }, []);
 
   return (
     <div className="absolute inset-0 w-full h-full">
       {isClient && (
-        <div 
-          className={`transition-opacity duration-1500 ease-in-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+        <div
+          className={`transition-opacity duration-1500 ease-in-out ${
+            isVisible ? "opacity-100" : "opacity-0"
+          }`}
         >
           <Particles
             id="tsparticles"
