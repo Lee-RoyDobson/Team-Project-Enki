@@ -65,34 +65,23 @@ export async function GET(request: NextRequest) {
       console.log("Student topics length:", studentDoc.topics?.length || 0);
     }
 
-    if (!studentDoc) {
-      return NextResponse.json(
-        {
-          messages: [
-            {
-              role: "assistant",
-              content: `Welcome to ${topic}! How can I help you?`,
-            },
-          ],
-        },
-        { status: 200 }
-      );
-    }
-
     // Find the topic in the student's topics array
-    console.log(
-      "Available topics:",
-      studentDoc.topics.map((t: any) => Object.keys(t)[0])
-    );
+    let topicData;
+    if (studentDoc && studentDoc.topics) {
+      console.log(
+        "Available topics:",
+        studentDoc.topics.map((t: any) => Object.keys(t)[0])
+      );
 
-    const topicData = studentDoc.topics.find(
-      (t: any) => Object.keys(t)[0] === formattedTopic
-    );
+      topicData = studentDoc.topics.find(
+        (t: any) => Object.keys(t)[0] === formattedTopic
+      );
 
-    console.log("Topic data found:", !!topicData);
-    if (topicData) {
-      console.log("Topic key:", Object.keys(topicData)[0]);
-      console.log("Topic messages:", topicData[formattedTopic]);
+      console.log("Topic data found:", !!topicData);
+      if (topicData) {
+        console.log("Topic key:", Object.keys(topicData)[0]);
+        console.log("Topic messages:", topicData[formattedTopic]);
+      }
     }
 
     if (topicData) {
@@ -102,19 +91,52 @@ export async function GET(request: NextRequest) {
         { status: 200 }
       );
     } else {
-      // Topic not found for this student
-      console.log("Topic not found, returning default message");
-      return NextResponse.json(
-        {
-          messages: [
-            {
-              role: "assistant",
-              content: `Welcome to ${topic}! How can I help you?`,
-            },
-          ],
-        },
-        { status: 200 }
+      // Topic not found for this student, fetch the topic's start message from Modules database
+      console.log(
+        "Topic not found, fetching start message from Modules database"
       );
+
+      // Check the Modules database for this topic's information
+      const modulesDb = client.db("Modules");
+      const topicsCollection = modulesDb.collection("5CM504");
+
+      const topicInfo = await topicsCollection.findOne({
+        topic: formattedTopic,
+      });
+
+      if (topicInfo && topicInfo.startMessage) {
+        console.log(
+          "Found topic in Modules database with startMessage:",
+          !!topicInfo.startMessage
+        );
+        return NextResponse.json(
+          {
+            messages: [
+              {
+                role: "assistant",
+                content: topicInfo.startMessage,
+              },
+            ],
+          },
+          { status: 200 }
+        );
+      } else {
+        // Fallback to default message if topic not found in Modules database
+        console.log(
+          "Topic not found in Modules database, returning default message"
+        );
+        return NextResponse.json(
+          {
+            messages: [
+              {
+                role: "assistant",
+                content: `Welcome to ${topic}! How can I help you?`,
+              },
+            ],
+          },
+          { status: 200 }
+        );
+      }
     }
   } catch (error) {
     console.error("Database error:", error);
@@ -162,6 +184,20 @@ export async function POST(request: NextRequest) {
       const database = client.db("Students");
       const collection = database.collection("5CM504");
 
+      // First, check if there is custom topic information in the Modules database
+      const modulesDb = client.db("Modules");
+      const topicsCollection = modulesDb.collection("5CM504");
+      const topicInfo = await topicsCollection.findOne({ topic });
+
+      // Default welcome message if no custom one is found
+      let welcomeMessage = `Welcome to ${topic}! How can I help you?`;
+
+      // Use custom start message if available
+      if (topicInfo && topicInfo.startMessage) {
+        welcomeMessage = topicInfo.startMessage;
+        console.log("Using custom startMessage from Modules database");
+      }
+
       // Find the student document
       let studentDoc = await collection.findOne({ student_id: studentId });
 
@@ -181,7 +217,7 @@ export async function POST(request: NextRequest) {
               [topic]: [
                 {
                   role: "assistant",
-                  content: `Welcome to ${topic}! How can I help you?`,
+                  content: welcomeMessage,
                 },
                 message,
               ],
@@ -203,14 +239,14 @@ export async function POST(request: NextRequest) {
       );
 
       if (topicIndex === -1 || topicIndex === undefined) {
-        // Topic doesn't exist, create it
+        // Topic doesn't exist, create it with appropriate welcome message
         const updatedTopics = [
           ...(studentDoc.topics || []),
           {
             [topic]: [
               {
                 role: "assistant",
-                content: `Welcome to ${topic}! How can I help you?`,
+                content: welcomeMessage,
               },
               message,
             ],
