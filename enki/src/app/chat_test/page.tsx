@@ -1,20 +1,33 @@
+/**
+ * Chat Test Page
+ *
+ * A test implementation of the chat interface that fetches topics from the API
+ * and renders the ChatInterface component with those topics.
+ */
 "use client";
 
 import { ChatInterface } from "@/components/ChatInterface";
 import { useEffect, useState } from "react";
 
-// Topic interface to define the structure of the topic data
+/**
+ * Topic interface defining the structure of topic data retrieved from the API.
+ */
 interface Topic {
   _id: string;
   topic: string;
   startMessage: string;
 }
 
+/**
+ * Chat page component that fetches and displays topics for the 5CM504 module.
+ * Renders the ChatInterface component with the retrieved topics.
+ */
 export default function ChatPage() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch topics from the API when component mounts
   useEffect(() => {
     const fetchTopics = async () => {
       try {
@@ -37,11 +50,12 @@ export default function ChatPage() {
     fetchTopics();
   }, []);
 
+  // Display loading or error states if needed
   if (isLoading)
     return <div className="p-8 text-center">Loading topics...</div>;
   if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
-  // Map topics to strings for the ChatInterface component if it expects string[] for topics
+  // Convert topic objects to string array for ChatInterface component
   const topicStrings = topics.map((t) => t.topic);
 
   return (

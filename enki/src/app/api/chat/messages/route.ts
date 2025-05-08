@@ -1,6 +1,18 @@
+/**
+ * Chat Messages API Route
+ *
+ * Handles retrieving and storing chat messages between students and the Enki AI.
+ * Messages are stored in a MongoDB database organized by student ID and topic.
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { MongoClient } from "mongodb";
 
+/**
+ * Handles GET requests to fetch chat messages for a specific student and topic.
+ *
+ * @param request - The incoming Next.js request object
+ * @returns A JSON response containing the messages or an error message
+ */
 export async function GET(request: NextRequest) {
   console.log("API endpoint called");
 
@@ -10,6 +22,7 @@ export async function GET(request: NextRequest) {
 
   console.log("Query parameters:", { studentId, topic });
 
+  // Validate required parameters
   if (!studentId || !topic) {
     return NextResponse.json(
       { error: "Missing required parameters" },
@@ -20,7 +33,7 @@ export async function GET(request: NextRequest) {
   // Format the topic name to match how it's stored in the database
   const formattedTopic = topic;
 
-  // Connect to MongoDB
+  // Verify MongoDB connection parameters
   const uri = process.env.MONGODB_URI;
   console.log("MongoDB URI exists:", !!uri);
 
@@ -41,7 +54,7 @@ export async function GET(request: NextRequest) {
     const database = client.db("Students");
     const collection = database.collection("5CM504");
 
-    // Debug to show all documents
+    // Debug to verify collection content
     console.log("Checking collection content...");
     const allDocs = await collection.find().limit(2).toArray();
     console.log("Documents in collection:", allDocs.length);
@@ -49,11 +62,11 @@ export async function GET(request: NextRequest) {
       console.log("First document ID field:", Object.keys(allDocs[0]));
     }
 
-    // Query for the student document - matching the structure from your example
+    // Query for the student document - first try with provided type
     console.log("Querying for student:", studentId);
     let studentDoc = await collection.findOne({ student_id: studentId });
 
-    // If not found with string, try as number
+    // If not found with string, try as number (fallback handling)
     if (!studentDoc) {
       console.log("Trying as number...");
       studentDoc = await collection.findOne({ student_id: Number(studentId) });
@@ -65,6 +78,7 @@ export async function GET(request: NextRequest) {
       console.log("Student topics length:", studentDoc.topics?.length || 0);
     }
 
+
     // Find the topic in the student's topics array
     let topicData;
     if (studentDoc && studentDoc.topics) {
@@ -72,6 +86,7 @@ export async function GET(request: NextRequest) {
         "Available topics:",
         studentDoc.topics.map((t: any) => Object.keys(t)[0])
       );
+
 
       topicData = studentDoc.topics.find(
         (t: any) => Object.keys(t)[0] === formattedTopic
@@ -85,15 +100,18 @@ export async function GET(request: NextRequest) {
     }
 
     if (topicData) {
+      // Return messages for the found topic
       console.log("Returning messages for topic:", formattedTopic);
       return NextResponse.json(
         { messages: topicData[formattedTopic] },
         { status: 200 }
       );
     } else {
+
       // Topic not found for this student, fetch the topic's start message from Modules database
       console.log(
         "Topic not found, fetching start message from Modules database"
+
       );
 
       // Check the Modules database for this topic's information
@@ -152,6 +170,13 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/**
+ * Handles POST requests to save new chat messages for a student and topic.
+ * Creates new student records or topics if they don't exist.
+ *
+ * @param request - The incoming Next.js request object containing message data
+ * @returns A JSON response indicating success or failure
+ */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -159,6 +184,7 @@ export async function POST(request: NextRequest) {
 
     console.log("POST endpoint called with:", { studentId, topic, message });
 
+    // Validate required parameters
     if (!studentId || !topic || !message) {
       return NextResponse.json(
         { error: "Missing required parameters" },
@@ -166,7 +192,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Connect to MongoDB
+    // Verify MongoDB connection parameters
     const uri = process.env.MONGODB_URI;
     if (!uri) {
       return NextResponse.json(
@@ -233,12 +259,13 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Find if the topic exists
+      // Find if the topic exists for this student
       const topicIndex = studentDoc.topics?.findIndex(
         (t: any) => Object.keys(t)[0] === topic
       );
 
       if (topicIndex === -1 || topicIndex === undefined) {
+
         // Topic doesn't exist, create it with appropriate welcome message
         const updatedTopics = [
           ...(studentDoc.topics || []),
@@ -258,7 +285,7 @@ export async function POST(request: NextRequest) {
           { $set: { topics: updatedTopics } }
         );
       } else {
-        // Topic exists, append the message
+        // Topic exists, append the message to the conversation
         const updatePath = `topics.${topicIndex}.${topic}`;
 
         await collection.updateOne(

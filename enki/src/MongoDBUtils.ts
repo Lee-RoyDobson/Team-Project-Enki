@@ -1,5 +1,12 @@
+/**
+ * MongoDB Connection Utility
+ *
+ * Provides a singleton MongoDB client connection for the application.
+ * Manages connection lifecycle differently based on environment (development/production).
+ */
 import { MongoClient } from "mongodb";
 
+// Verify MongoDB connection string is configured
 if (!process.env.MONGODB_URI) {
   throw new Error("Please add your MongoDB URI to .env.local");
 }
@@ -17,6 +24,7 @@ if (process.env.NODE_ENV === "development") {
     _mongoClientPromise?: Promise<MongoClient>;
   };
 
+  // Create client only once and reuse across hot reloads in development
   if (!globalWithMongo._mongoClientPromise) {
     client = new MongoClient(uri, options);
     globalWithMongo._mongoClientPromise = client.connect();
@@ -28,5 +36,5 @@ if (process.env.NODE_ENV === "development") {
   clientPromise = client.connect();
 }
 
-// Export a module-scoped MongoClient promise
+// Export a module-scoped MongoClient promise for use throughout the application
 export default clientPromise;
