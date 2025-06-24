@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "User with this email or studentID already exists" }, { status: 409 });
   }
   const hashed = await bcrypt.hash(password, 10);
-  await db.collection("accounts").insertOne({ email, password: hashed, studentID });
+  await db.collection("accounts").insertOne({ email, password: hashed, studentID, role: "student" });
   await client.close();
   return NextResponse.json({ success: true });
 }
